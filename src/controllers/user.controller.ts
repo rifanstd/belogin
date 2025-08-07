@@ -8,19 +8,17 @@ class UserController {
     this.userService = new UserService();
   }
 
-  public async getAllUsers(req: Request, res: Response) {
-    const result = await this.userService.findAllUsers();
+  public async getUsers(req: Request, res: Response) {
+    const { email } = req.query;
 
-    if (!result.success) {
-      return res.status(result.statusCode).json({
-        message: result.message,
-      });
+    if (email) {
+      const result = await this.userService.findUserByEmail(email as string);
+      return res.status(result.statusCode).json(result);
     }
 
-    return res.status(result.statusCode).json({
-      message: result.message,
-      data: result.data,
-    });
+    const result = await this.userService.findAllUsers();
+
+    return res.status(result.statusCode).json(result);
   }
 
   public async getUserbyId(req: Request, res: Response) {
@@ -28,16 +26,7 @@ class UserController {
 
     const result = await this.userService.findUserById(userId);
 
-    if (!result.success) {
-      return res.status(result.statusCode).json({
-        message: result.message,
-      });
-    }
-
-    return res.status(result.statusCode).json({
-      message: result.message,
-      data: result.data,
-    });
+    return res.status(result.statusCode).json(result);
   }
 }
 

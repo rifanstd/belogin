@@ -1,60 +1,9 @@
 import bcrypt from "bcrypt";
 import db from "../databases/database";
-import { UserDTO } from "../models/user.model";
+import { UserDTO } from "../models/user.dto";
 import { ApiResult, ResultBuilder } from "../utils/result";
 
 class UserService {
-  public async findUserById(id: number): Promise<ApiResult<UserDTO | null>> {
-    try {
-      const user = await db
-        .selectFrom("users")
-        .where("id", "=", id)
-        .selectAll()
-        .executeTakeFirst();
-
-      if (!user) {
-        return ResultBuilder.success({
-          statusCode: 404,
-          message: `Pengguna dengan ID ${id} tidak ditemukan`,
-        });
-      }
-
-      const UserDTO: UserDTO = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      };
-
-      return ResultBuilder.success({
-        statusCode: 200,
-        message: `Pengguna dengan ID ${id} ditemukan`,
-        data: UserDTO,
-      });
-    } catch (error) {
-      console.error("Error finding user by ID:", error);
-      return ResultBuilder.internalServerError();
-    }
-  }
-
-  public async findUserByEmail(email: string): Promise<ApiResult<any>> {
-    try {
-      const user = await db
-        .selectFrom("users")
-        .selectAll()
-        .where("email", "=", email)
-        .executeTakeFirst();
-
-      return ResultBuilder.success({
-        statusCode: 200,
-        message: `Pengguna dengan email ${email} ditemukan`,
-        data: user,
-      });
-    } catch (error) {
-      console.error("Error finding user by email:", error);
-      return ResultBuilder.internalServerError();
-    }
-  }
-
   public async findAllUsers(): Promise<ApiResult<UserDTO[]>> {
     try {
       const users = await db.selectFrom("users").selectAll().execute();
@@ -87,6 +36,70 @@ class UserService {
     }
   }
 
+  public async findUserById(id: number): Promise<ApiResult<UserDTO | null>> {
+    try {
+      const user = await db
+        .selectFrom("users")
+        .where("id", "=", id)
+        .selectAll()
+        .executeTakeFirst();
+
+      if (!user) {
+        return ResultBuilder.success({
+          statusCode: 404,
+          message: `Pengguna dengan ID ${id} tidak ditemukan`,
+        });
+      }
+
+      const userDTO: UserDTO = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      };
+
+      return ResultBuilder.success({
+        statusCode: 200,
+        message: `Pengguna dengan ID ${id} ditemukan`,
+        data: userDTO,
+      });
+    } catch (error) {
+      console.error("Error finding user by ID:", error);
+      return ResultBuilder.internalServerError();
+    }
+  }
+
+  public async findUserByEmail(email: string): Promise<ApiResult<UserDTO>> {
+    try {
+      const user = await db
+        .selectFrom("users")
+        .selectAll()
+        .where("email", "=", email)
+        .executeTakeFirst();
+
+      if (!user) {
+        return ResultBuilder.success({
+          statusCode: 404,
+          message: `Pengguna dengan email ${email} tidak ditemukan`,
+        });
+      }
+
+      const userDTO: UserDTO = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      };
+
+      return ResultBuilder.success({
+        statusCode: 200,
+        message: `Pengguna dengan email ${email} ditemukan`,
+        data: userDTO,
+      });
+    } catch (error) {
+      console.error("Error finding user by email:", error);
+      return ResultBuilder.internalServerError();
+    }
+  }
+
   public async createUser(
     name: string,
     email: string,
@@ -99,10 +112,10 @@ class UserService {
         return existingUserResult;
       }
 
-      if (existingUserResult.data) {
+      if (existingUserResult.statusCode === 200) {
         return ResultBuilder.error({
           statusCode: 409,
-          message: `Pengguna dengan email ${email} sudah ada`,
+          message: `Pengguna dengan email ${email} sudah ada. Silahkan gunakan email lain.`,
         });
       }
 
@@ -123,16 +136,16 @@ class UserService {
         return ResultBuilder.internalServerError();
       }
 
-      console.log("[ SUCCESS ] User created:", createdUser);
+      const userDTO: UserDTO = {
+        id: createdUser.id,
+        name: createdUser.name,
+        email: createdUser.email,
+      };
 
       return ResultBuilder.success({
         statusCode: 201,
         message: "Berhasil membuat pengguna!",
-        data: {
-          id: createdUser.id,
-          name: createdUser.name,
-          email: createdUser.email,
-        } as UserDTO,
+        data: userDTO,
       });
     } catch (error) {
       console.error("Error creating user:", error);

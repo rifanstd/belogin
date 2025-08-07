@@ -5,10 +5,10 @@ import userRouter from "./user.route";
 const router: Router = Router();
 
 router.get("/", (req, res) => {
-  res.send("Welcome to the API");
+  res.send("Welcome to the BE LOGIN API");
 });
 
-router.use("/auth", authRouter);
-router.use("/users", userRouter);
+router.use(authRouter);
+router.use(userRouter);
 
 export default router;

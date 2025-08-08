@@ -36,7 +36,6 @@ export class AuthService {
 
       const signInDTO: SignInDTO = {
         email: user.email,
-        password: user.password,
         token: token,
       };
 

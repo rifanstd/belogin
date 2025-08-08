@@ -10,7 +10,7 @@ dotenv.config();
 
 // Create an Express application
 const app: Application = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT);
 
 // Middlewares
 app.use(helmet()); // Security headers

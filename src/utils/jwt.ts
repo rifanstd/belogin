@@ -1,7 +1,10 @@
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
-const JWT_SECRET = process.env.JWT_SECRET || "rifanstd";
-const JWT_EXPIRATION = "1h";
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_EXPIRATION = "1d";
 
 export interface JWTPayload {
   id: number;

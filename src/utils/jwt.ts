@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import fs from "fs";
+import path from "path";
 
 dotenv.config();
 
@@ -12,6 +14,7 @@ export interface JWTPayload {
 }
 
 export class JWTUtils {
+  static isUseRSA: Boolean = true;
   public static generateToken(payload: JWTPayload): string {
     return jwt.sign(payload, JWT_SECRET, {
       algorithm: "HS256",
@@ -19,7 +22,28 @@ export class JWTUtils {
     });
   }
 
+  public static generateTokenRSA(payload: JWTPayload): string {
+    const privateKey = fs.readFileSync(
+      path.join(__dirname, "../keys/private.key")
+    );
+
+    return jwt.sign(payload, privateKey, {
+      algorithm: "RS256",
+      expiresIn: JWT_EXPIRATION,
+    });
+  }
+
   public static verify(token: string): JWTPayload {
     return jwt.verify(token, JWT_SECRET) as JWTPayload;
+  }
+
+  public static verifyRSA(token: string): JWTPayload {
+    const publicKey = fs.readFileSync(
+      path.join(__dirname, "../keys/public.key")
+    );
+
+    return jwt.verify(token, publicKey, {
+      algorithms: ["RS256"],
+    }) as JWTPayload;
   }
 }

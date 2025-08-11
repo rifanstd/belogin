@@ -32,7 +32,15 @@ export class AuthService {
         });
       }
 
-      const token = JWTUtils.generateToken({ id: user.id, email: user.email });
+      let token = "";
+
+      if (JWTUtils.isUseRSA) {
+        console.log("Auth Service | Use RSA");
+        token = JWTUtils.generateTokenRSA({ id: user.id, email: user.email });
+      } else {
+        console.log("Auth Service | Use HMAC");
+        token = JWTUtils.generateToken({ id: user.id, email: user.email });
+      }
 
       const signInDTO: SignInDTO = {
         email: user.email,

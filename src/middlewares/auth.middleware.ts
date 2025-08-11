@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { ResultBuilder } from "../utils/result";
 import { JWTUtils } from "../utils/jwt";
+import {
+  JsonWebTokenError,
+  NotBeforeError,
+  TokenExpiredError,
+} from "jsonwebtoken";
 
 export class AuthMiddleware {
   public authenticate(req: Request, res: Response, next: NextFunction) {
@@ -15,13 +20,26 @@ export class AuthMiddleware {
     const token = authHeader.split(" ")[1];
 
     try {
-      JWTUtils.verify(token);
+      if (JWTUtils.isUseRSA) {
+        console.log("AuthMiddleware | Use RSA");
+        JWTUtils.verifyRSA(token);
+      } else {
+        console.log("AuthMiddleware | Use HMAC");
+        JWTUtils.verify(token);
+      }
       next();
     } catch (error) {
-      console.log("Error verifying token:", error);
-      return res
-        .status(401)
-        .json({ message: "Token tidak valid atau kadaluarsa!" });
+      let message = "";
+      if (error instanceof TokenExpiredError) {
+        message = "Token kadaluarsa!";
+      } else if (error instanceof JsonWebTokenError) {
+        message = "Token tidak valid!";
+      } else if (error instanceof NotBeforeError) {
+        message = "Token belum aktif!";
+      } else {
+        message = "Unauthorized";
+      }
+      return res.status(401).json({ message: message });
     }
   }
 }

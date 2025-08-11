@@ -1,7 +1,10 @@
+import { PaginationDTO } from "../models/pagination.dto";
+
 export interface SuccessResult<T> {
   success: true;
   statusCode: number;
   message: string;
+  pagination?: PaginationDTO;
   data?: T;
 }
 
@@ -18,15 +21,18 @@ export class ResultBuilder {
     statusCode,
     data,
     message,
+    pagination,
   }: {
     statusCode: number;
     data?: T;
     message: string;
+    pagination?: PaginationDTO;
   }): SuccessResult<T> {
     return {
       success: true,
       statusCode: statusCode,
       message,
+      pagination,
       data,
     };
   }

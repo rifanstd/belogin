@@ -21,10 +21,10 @@ export class AuthMiddleware {
 
     try {
       if (JWTUtils.isUseRSA) {
-        console.log("AuthMiddleware | Use RSA");
+        console.log("Auth Middleware | Use RSA");
         JWTUtils.verifyRSA(token);
       } else {
-        console.log("AuthMiddleware | Use HMAC");
+        console.log("Auth Middleware | Use HMAC");
         JWTUtils.verify(token);
       }
       next();

@@ -2,6 +2,7 @@ import { Generated } from "kysely";
 
 export interface Database {
   users: UserTable;
+  products: ProductTable;
 }
 
 export interface UserTable {
@@ -9,4 +10,12 @@ export interface UserTable {
   name: string;
   email: string;
   password: string;
+}
+
+export interface ProductTable {
+  id: Generated<number>;
+  name: string;
+  price: number;
+  stock: number;
+  created_at: Date;
 }

@@ -1,17 +1,15 @@
 import { Kysely, PostgresDialect } from "kysely";
 import { Pool } from "pg";
 import { Database } from "./types";
-
-import dotenv from "dotenv";
-dotenv.config();
+import { ENV } from "../config/env";
 
 const dialect: PostgresDialect = new PostgresDialect({
   pool: new Pool({
-    host: process.env.DB_HOST as string,
-    port: Number(process.env.DB_PORT),
-    database: process.env.DB_NAME as string,
-    user: process.env.DB_USER as string,
-    password: process.env.DB_PASSWORD as string,
+    host: ENV.DB.HOST,
+    port: ENV.DB.PORT,
+    database: ENV.DB.NAME,
+    user: ENV.DB.USER,
+    password: ENV.DB.PASSWORD,
   }),
 });
 
